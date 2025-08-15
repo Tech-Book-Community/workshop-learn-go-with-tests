@@ -1,0 +1,33 @@
+# https://bwoff.medium.com/go-ci-cd-with-github-actions-a29f7744c18f
+# .github/workflows/ci.yml
+name: Go CI
+
+# ❶ 觸發條件要寫在 root level，而不是 job 裡
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test_build:
+    runs-on: ubuntu-latest
+
+    # ❷ 建議開啟 read-only 權限即可
+    permissions:
+      contents: read
+
+    steps:
+      # 1. 取回程式碼
+      - uses: actions/checkout@v4
+
+      # 2. 安裝 Go，並開啟官方 cache
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24.3" # 記得用字串
+          cache: true # 自動 cache GOMODCACHE
+
+      # 7. 單元測試（含 coverage）
+      - name: Test with coverage
+        run: go test ./...
